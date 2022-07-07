@@ -9,10 +9,13 @@
 import Foundation
 
 extension String {
-    init?(data: Data, `default`: String.Encoding = .utf8) {
+    init?(data: Data, `default`: String.Encoding = .utf8, textEncodingName: String) {
         var encoding = `default`
-        if #available(macOS 10.10, *) {
-            encoding = data.stringEncoding ?? `default`
+        let estr = textEncodingName
+        let cfe = CFStringConvertIANACharSetNameToEncoding(estr as CFString)
+        if cfe != kCFStringEncodingInvalidId {
+            let se = CFStringConvertEncodingToNSStringEncoding(cfe)
+            encoding = String.Encoding(rawValue: se)
         }
         self.init(data: data, encoding: encoding)
     }
